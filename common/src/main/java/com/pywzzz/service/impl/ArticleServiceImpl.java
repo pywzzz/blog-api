@@ -5,10 +5,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.pywzzz.domain.ResponseResult;
 import com.pywzzz.domain.entity.Article;
+import com.pywzzz.domain.vo.HotArticleVo;
 import com.pywzzz.mapper.ArticleMapper;
 import com.pywzzz.service.ArticleService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,6 +28,15 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         page(page, queryWrapper);
         // 返回结果
         List<Article> articles = page.getRecords();
-        return ResponseResult.okResult(articles);
+
+        List<HotArticleVo> articleVos = new ArrayList<>();
+        for (Article article : articles) {
+            HotArticleVo hotArticleVo = new HotArticleVo();
+            // bean拷贝（拷贝时字段啥的要一致）
+            BeanUtils.copyProperties(article, hotArticleVo);
+            articleVos.add(hotArticleVo);
+        }
+
+        return ResponseResult.okResult(articleVos);
     }
 }
