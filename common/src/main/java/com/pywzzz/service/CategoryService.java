@@ -1,6 +1,7 @@
 package com.pywzzz.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.pywzzz.domain.ResponseResult;
 import com.pywzzz.domain.entity.Category;
 
 
@@ -12,4 +13,5 @@ import com.pywzzz.domain.entity.Category;
  */
 public interface CategoryService extends IService<Category> {
 
+    ResponseResult getCategoryList();
 }
