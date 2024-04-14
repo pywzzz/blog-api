@@ -6,13 +6,16 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.pywzzz.constants.SystemConstants;
 import com.pywzzz.domain.ResponseResult;
 import com.pywzzz.domain.entity.Article;
+import com.pywzzz.domain.vo.ArticleListVo;
 import com.pywzzz.domain.vo.HotArticleVo;
+import com.pywzzz.domain.vo.PageVo;
 import com.pywzzz.mapper.ArticleMapper;
 import com.pywzzz.service.ArticleService;
 import com.pywzzz.utils.BeanCopyUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> implements ArticleService {
@@ -31,5 +34,24 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
         List<HotArticleVo> hotArticleVos = BeanCopyUtils.copyBeanList(articles, HotArticleVo.class);
         return ResponseResult.okResult(hotArticleVos);
+    }
+
+    @Override
+    public ResponseResult articleList(Integer pageNum, Integer pageSize, Long categoryId) {
+        LambdaQueryWrapper<Article> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        // 如果有categoryId，则查询时要和传入的相同
+        lambdaQueryWrapper.eq(Objects.nonNull(categoryId) && categoryId > 0, Article::getCategoryId, categoryId);
+        // 文章应该是正式发布的
+        lambdaQueryWrapper.eq(Article::getStatus, SystemConstants.ARTICLE_STATUS_NORMAL);
+        // 按isTop大小进行降序（由于1为顶置0不为，所以降序排列能达到顶置的文章在前的效果）
+        lambdaQueryWrapper.orderByDesc(Article::getIsTop);
+        // 分页查询
+        Page<Article> page = new Page<>(pageNum, pageSize);
+        page(page, lambdaQueryWrapper);
+        // 封装vo
+        List<ArticleListVo> articleListVos = BeanCopyUtils.copyBeanList(page.getRecords(), ArticleListVo.class);
+        PageVo pageVo = new PageVo(articleListVos, page.getTotal());
+
+        return ResponseResult.okResult(pageVo);
     }
 }
