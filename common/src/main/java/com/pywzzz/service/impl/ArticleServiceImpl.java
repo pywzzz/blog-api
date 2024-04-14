@@ -16,11 +16,14 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Override
     public ResponseResult hotArticleList() {
         LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
-
+        // 必须是正式文章
         queryWrapper.eq(Article::getStatus, 0);
+        // 按照浏览量进行将序排列
         queryWrapper.orderByDesc(Article::getViewCount);
+        // 查询第1页，每页最多10条
         Page<Article> page = new Page(1, 10);
         page(page, queryWrapper);
+        // 返回结果
         List<Article> articles = page.getRecords();
         return ResponseResult.okResult(articles);
     }
