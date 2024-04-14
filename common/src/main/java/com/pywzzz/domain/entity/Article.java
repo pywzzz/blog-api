@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.util.Date;
 
@@ -19,6 +20,8 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @TableName("article")
+// 如果不加这个注解，那么set方法的返回值默认是void，而加了后，返回类型就会变为这个实体类（可 alt+7 自己看）
+@Accessors(chain = true)
 public class Article {
 
     @TableId

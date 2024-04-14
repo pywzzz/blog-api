@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.pywzzz.constants.SystemConstants;
 import com.pywzzz.domain.ResponseResult;
 import com.pywzzz.domain.entity.Article;
-import com.pywzzz.domain.entity.Category;
 import com.pywzzz.domain.vo.ArticleListVo;
 import com.pywzzz.domain.vo.HotArticleVo;
 import com.pywzzz.domain.vo.PageVo;
@@ -19,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> implements ArticleService {
@@ -56,11 +56,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         Page<Article> page = new Page<>(pageNum, pageSize);
         page(page, lambdaQueryWrapper);
         // 根据articleId去查询categoryName并将查询到的name进行赋值
-        List<Article> articles = page.getRecords();
-        for (Article article : articles) {
-            Category category = categoryService.getById(article.getCategoryId());
-            article.setCategoryName(category.getName());
-        }
+        page.getRecords().stream().map(article -> article.setCategoryName(categoryService.getById(article.getCategoryId()).getName())).collect(Collectors.toList());
         // 封装vo
         List<ArticleListVo> articleListVos = BeanCopyUtils.copyBeanList(page.getRecords(), ArticleListVo.class);
         PageVo pageVo = new PageVo(articleListVos, page.getTotal());
