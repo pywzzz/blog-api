@@ -1,5 +1,6 @@
 package com.pywzzz.domain.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
@@ -30,6 +31,9 @@ public class Article {
     private String summary;
     // 所属分类id
     private Long categoryId;
+    // 数据库表不存在，但api中要出现的一个字段
+    @TableField(exist = false)
+    private String categoryName;
     // 缩略图
     private String thumbnail;
     // 是否置顶（0否，1是）

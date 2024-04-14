@@ -6,12 +6,15 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.pywzzz.constants.SystemConstants;
 import com.pywzzz.domain.ResponseResult;
 import com.pywzzz.domain.entity.Article;
+import com.pywzzz.domain.entity.Category;
 import com.pywzzz.domain.vo.ArticleListVo;
 import com.pywzzz.domain.vo.HotArticleVo;
 import com.pywzzz.domain.vo.PageVo;
 import com.pywzzz.mapper.ArticleMapper;
 import com.pywzzz.service.ArticleService;
+import com.pywzzz.service.CategoryService;
 import com.pywzzz.utils.BeanCopyUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +22,10 @@ import java.util.Objects;
 
 @Service
 public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> implements ArticleService {
+
+    @Autowired
+    private CategoryService categoryService;
+
     @Override
     public ResponseResult hotArticleList() {
         LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
@@ -48,6 +55,12 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         // 分页查询
         Page<Article> page = new Page<>(pageNum, pageSize);
         page(page, lambdaQueryWrapper);
+        // 根据articleId去查询categoryName并将查询到的name进行赋值
+        List<Article> articles = page.getRecords();
+        for (Article article : articles) {
+            Category category = categoryService.getById(article.getCategoryId());
+            article.setCategoryName(category.getName());
+        }
         // 封装vo
         List<ArticleListVo> articleListVos = BeanCopyUtils.copyBeanList(page.getRecords(), ArticleListVo.class);
         PageVo pageVo = new PageVo(articleListVos, page.getTotal());
