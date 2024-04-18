@@ -23,7 +23,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     AuthenticationEntryPoint authenticationEntryPoint;
-    
+
     @Autowired
     AccessDeniedHandler accessDeniedHandler;
 
@@ -49,10 +49,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 // 对于登录接口 允许匿名访问
                 .antMatchers("/login").anonymous()
+                // 必须先登录了，才能去使用登出这个接口
+                .antMatchers("/logout").authenticated()
                 // 除上面外的所有请求全部不需要认证即可访问
                 .anyRequest().permitAll();
 
-
+        // 因为spring security有一个默认的用于注销的接口，url也为 /logout ，所以这儿禁用一下以防止和你自己写的冲突
         http.logout().disable();
 
         // 把jwtAuthenticationTokenFilter添加到SpringSecurity的过滤器链中
