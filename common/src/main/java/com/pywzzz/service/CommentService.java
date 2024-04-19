@@ -1,6 +1,7 @@
 package com.pywzzz.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.pywzzz.domain.ResponseResult;
 import com.pywzzz.domain.entity.Comment;
 
 
@@ -12,4 +13,5 @@ import com.pywzzz.domain.entity.Comment;
  */
 public interface CommentService extends IService<Comment> {
 
+    ResponseResult commentList(Long articleId, Integer pageNum, Integer pageSize);
 }
