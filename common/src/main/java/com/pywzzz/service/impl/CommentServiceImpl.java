@@ -7,12 +7,15 @@ import com.pywzzz.domain.ResponseResult;
 import com.pywzzz.domain.entity.Comment;
 import com.pywzzz.domain.vo.CommentVo;
 import com.pywzzz.domain.vo.PageVo;
+import com.pywzzz.eunms.AppHttpCodeEnum;
+import com.pywzzz.exception.SystemException;
 import com.pywzzz.mapper.CommentMapper;
 import com.pywzzz.service.CommentService;
 import com.pywzzz.service.UserService;
 import com.pywzzz.utils.BeanCopyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -54,6 +57,16 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         return ResponseResult.okResult(new PageVo(commentVoList, page.getTotal()));
     }
 
+    @Override
+    public ResponseResult addComment(Comment comment) {
+        // 评论内容不能为空
+        if (!StringUtils.hasText(comment.getContent())) {
+            throw new SystemException(AppHttpCodeEnum.CONTENT_NOT_NULL);
+        }
+        save(comment);
+        return ResponseResult.okResult();
+    }
+
     private List<CommentVo> toCommentVoList(List<Comment> list) {
         List<CommentVo> commentVos = BeanCopyUtils.copyBeanList(list, CommentVo.class);
         // 遍历vo集合
@@ -87,7 +100,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         List<Comment> comments = list(queryWrapper);
 
         List<CommentVo> commentVos = toCommentVoList(comments);
-        
+
         return commentVos;
     }
 }
