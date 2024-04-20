@@ -1,5 +1,6 @@
 package com.pywzzz.controller;
 
+import com.pywzzz.annotation.SystemLog;
 import com.pywzzz.domain.ResponseResult;
 import com.pywzzz.domain.entity.User;
 import com.pywzzz.service.UserService;
@@ -19,6 +20,7 @@ public class UserController {
     }
 
     @PutMapping("/userInfo")
+    @SystemLog(businessName = "更新用户信息")
     public ResponseResult updateUserInfo(@RequestBody User user) {
         return userService.updateUserInfo(user);
     }
