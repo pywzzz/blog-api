@@ -1,5 +1,6 @@
 package com.pywzzz.controller;
 
+import com.pywzzz.constants.SystemConstants;
 import com.pywzzz.domain.ResponseResult;
 import com.pywzzz.domain.entity.Comment;
 import com.pywzzz.service.CommentService;
@@ -15,7 +16,12 @@ public class CommentController {
 
     @GetMapping("/commentList")
     public ResponseResult commentList(Long articleId, Integer pageNum, Integer pageSize) {
-        return commentService.commentList(articleId, pageNum, pageSize);
+        return commentService.commentList(SystemConstants.ARTICLE_COMMENT, articleId, pageNum, pageSize);
+    }
+
+    @GetMapping("/linkCommentList")
+    public ResponseResult linkCommentList(Integer pageNum, Integer pageSize) {
+        return commentService.commentList(SystemConstants.LINK_COMMENT, null, pageNum, pageSize);
     }
 
     @PostMapping
