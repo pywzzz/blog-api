@@ -30,4 +30,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         
         return ResponseResult.okResult(vo);
     }
+
+    @Override
+    public ResponseResult updateUserInfo(User user) {
+        updateById(user);
+        return ResponseResult.okResult();
+    }
 }
