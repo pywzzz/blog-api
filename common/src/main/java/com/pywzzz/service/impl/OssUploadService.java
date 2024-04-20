@@ -2,7 +2,10 @@ package com.pywzzz.service.impl;
 
 import com.google.gson.Gson;
 import com.pywzzz.domain.ResponseResult;
+import com.pywzzz.eunms.AppHttpCodeEnum;
+import com.pywzzz.exception.SystemException;
 import com.pywzzz.service.UploadService;
+import com.pywzzz.utils.PathUtils;
 import com.qiniu.common.QiniuException;
 import com.qiniu.http.Response;
 import com.qiniu.storage.Configuration;
@@ -26,14 +29,14 @@ public class OssUploadService implements UploadService {
     private String secretKey;
     private String bucket;
 
-    private String uploadOss(MultipartFile imgFile) {
+    private String uploadOss(MultipartFile imgFile, String filePath) {
         // 构造一个带指定 Region 对象的配置类
         Configuration cfg = new Configuration(Region.autoRegion());
 
         UploadManager uploadManager = new UploadManager(cfg);
 
         // 默认不指定key的情况下，以文件内容的hash值作为文件名
-        String key = "test.png";
+        String key = filePath;
 
         try {
             InputStream inputStream = imgFile.getInputStream();
@@ -47,7 +50,7 @@ public class OssUploadService implements UploadService {
                 System.out.println(putRet.key);
                 System.out.println(putRet.hash);
 
-                return "aaa";
+                return "http://sc8cql7ug.hb-bkt.clouddn.com/" + key;
             } catch (QiniuException ex) {
                 Response r = ex.response;
                 System.err.println(r.toString());
@@ -65,7 +68,15 @@ public class OssUploadService implements UploadService {
 
     @Override
     public ResponseResult uploadImg(MultipartFile img) {
-        String url = uploadOss(img);
+        // 获取原始文件名
+        String originalFilename = img.getOriginalFilename();
+        // 对原始文件名进行判断
+        if (!originalFilename.endsWith(".png")) {
+            throw new SystemException(AppHttpCodeEnum.FILE_TYPE_ERROR);
+        }
+        // 如果判断通过上传文件到OSS
+        String filePath = PathUtils.generateFilePath(originalFilename);
+        String url = uploadOss(img, filePath);
         return ResponseResult.okResult(url);
     }
 }
