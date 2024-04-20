@@ -1,6 +1,8 @@
-package com.pywzzz;
+package com.pywzzz.service.impl;
 
 import com.google.gson.Gson;
+import com.pywzzz.domain.ResponseResult;
+import com.pywzzz.service.UploadService;
 import com.qiniu.common.QiniuException;
 import com.qiniu.http.Response;
 import com.qiniu.storage.Configuration;
@@ -8,48 +10,33 @@ import com.qiniu.storage.Region;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.util.Auth;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.stereotype.Component;
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileInputStream;
 import java.io.InputStream;
 
-@SpringBootTest
-@Component
-// 这儿暂时把下面这玩意儿注释掉了，不然OssUploadService那儿会报错
-// 这个报错虽然不影响结果，但是看着难受。也可以用@Value注解来解决
-// @ConfigurationProperties(prefix = "oss")
-public class OSSTest {
+@Service
+@Data
+@ConfigurationProperties(prefix = "oss")
+public class OssUploadService implements UploadService {
 
     private String accessKey;
     private String secretKey;
     private String bucket;
 
-    public void setAccessKey(String accessKey) {
-        this.accessKey = accessKey;
-    }
-
-    public void setSecretKey(String secretKey) {
-        this.secretKey = secretKey;
-    }
-
-    public void setBucket(String bucket) {
-        this.bucket = bucket;
-    }
-
-    @Test
-    public void testOss() {
+    private String uploadOss(MultipartFile imgFile) {
         // 构造一个带指定 Region 对象的配置类
         Configuration cfg = new Configuration(Region.autoRegion());
 
         UploadManager uploadManager = new UploadManager(cfg);
 
         // 默认不指定key的情况下，以文件内容的hash值作为文件名
-        String key = "image/test.png";
+        String key = "test.png";
 
         try {
-            InputStream inputStream = new FileInputStream("D:\\idm\\downloads\\images\\profile\\111.png");
+            InputStream inputStream = imgFile.getInputStream();
             Auth auth = Auth.create(accessKey, secretKey);
             String upToken = auth.uploadToken(bucket);
 
@@ -59,6 +46,8 @@ public class OSSTest {
                 DefaultPutRet putRet = new Gson().fromJson(response.bodyString(), DefaultPutRet.class);
                 System.out.println(putRet.key);
                 System.out.println(putRet.hash);
+
+                return "aaa";
             } catch (QiniuException ex) {
                 Response r = ex.response;
                 System.err.println(r.toString());
@@ -71,6 +60,12 @@ public class OSSTest {
         } catch (Exception ex) {
             // ignore
         }
+        return "bbb";
+    }
 
+    @Override
+    public ResponseResult uploadImg(MultipartFile img) {
+        String url = uploadOss(img);
+        return ResponseResult.okResult(url);
     }
 }
