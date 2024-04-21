@@ -2,8 +2,10 @@ package com.pywzzz.controller;
 
 import com.pywzzz.constants.SystemConstants;
 import com.pywzzz.domain.ResponseResult;
+import com.pywzzz.domain.dto.AddCommentDTO;
 import com.pywzzz.domain.entity.Comment;
 import com.pywzzz.service.CommentService;
+import com.pywzzz.utils.BeanCopyUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -35,7 +37,8 @@ public class CommentController {
     }
 
     @PostMapping
-    public ResponseResult addComment(@RequestBody Comment comment) {
+    public ResponseResult addComment(@RequestBody AddCommentDTO addCommentDTO) {
+        Comment comment = BeanCopyUtils.copyBean(addCommentDTO, Comment.class);
         return commentService.addComment(comment);
     }
 }
