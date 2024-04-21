@@ -5,6 +5,7 @@ import com.pywzzz.domain.ResponseResult;
 import com.pywzzz.domain.entity.Comment;
 import com.pywzzz.service.CommentService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +23,7 @@ public class CommentController {
     }
 
     @GetMapping("/linkCommentList")
+    @ApiOperation(value = "友链评论列表", notes = "获取一页友链评论")
     public ResponseResult linkCommentList(Integer pageNum, Integer pageSize) {
         return commentService.commentList(SystemConstants.LINK_COMMENT, null, pageNum, pageSize);
     }
